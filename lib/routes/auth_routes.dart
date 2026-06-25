@@ -21,23 +21,14 @@ Router authRoute(UserRepository userRepository) {
       );
     }
     final authRequest = AuthRequest.fromJson(json);
+    final errors = authRequest.validate();
 
-    if (authRequest.username.trim().isEmpty) {
+    if (errors.isNotEmpty) {
       return Response.badRequest(
-        body: jsonEncode({'message': 'Username and password cannot be empty'}),
-        headers: {'Content-Type': 'application/json'},
-      );
-    }
-    if (authRequest.username.length < 4) {
-      return Response.badRequest(
-        body: jsonEncode({'message': 'username must be at least 4 characters'}),
-        headers: {'Content-Type': 'application/json'},
-      );
-    }
-    if (authRequest.password.length < 6) {
-      return Response.badRequest(
-        body: jsonEncode({'message': 'Password must be 6 characters as least'}),
-        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'message': 'Validation failed',
+          'error': errors,
+        })
       );
     }
     final user = await userRepository.findByUsernameAndPassword(

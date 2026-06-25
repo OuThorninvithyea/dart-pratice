@@ -10,6 +10,28 @@ class AuthRequest {
         json['password'] is  String ? json['password'] as String : '',
     );
   }
+
+  List<String> validate() {
+    final errors = <String>[];
+
+    if (username
+        .trim()
+        .isEmpty || password
+        .trim()
+        .isEmpty) {
+      errors.add('Username and password cannot be empty');
+    }
+    if (username
+        .trim()
+        .length < 4) {
+      errors.add('Username must be at least 4 characters');
+    }
+    if (password.length < 6) {
+      errors.add('Password must be at least 6 characters');
+    }
+
+    return errors;
+  }
   Map<String, dynamic> toJson() {
     return {'username': username, "password": password};
   }
