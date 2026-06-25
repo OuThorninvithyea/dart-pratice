@@ -1,13 +1,14 @@
 import 'dart:convert';
-import 'package:dart_api/models/auth_request.dart';
-import 'package:shelf/shelf.dart';
-import 'package:shelf_router/shelf_router.dart';
-import '../data/fake_user.dart';
 
-Router authRoute() {
+import 'package:dart_api/models/auth_request.dart';
+import 'package:dart_api/models/repository/repository.dart';
+import 'package:shelf_router/shelf_router.dart';
+import 'package:shelf/shelf.dart';
+
+Router authRoute(UserRepository userRepository) {
   final router = Router();
+
   router.post('/login', (Request req) async {
-    // convert incomming byte to string first
     final body = await req.readAsString();
 
     Map<String, dynamic> json;
@@ -19,52 +20,42 @@ Router authRoute() {
         headers: {'Content-Type': 'application/json'},
       );
     }
-
     final authRequest = AuthRequest.fromJson(json);
 
     if (authRequest.username.trim().isEmpty) {
       return Response.badRequest(
-        body: jsonEncode({'message': 'Username is required'}),
+        body: jsonEncode({'message': 'Username and password cannot be empty'}),
         headers: {'Content-Type': 'application/json'},
       );
     }
-
-    if (authRequest.password.trim().isEmpty) {
-      return Response.badRequest(
-        body: jsonEncode({'message': 'Passowrd is requied'}),
-        headers: {'Content-Type': 'application/json'},
-      );
-    }
-    
     if (authRequest.username.length < 4) {
       return Response.badRequest(
-        body: jsonEncode({'message': 'Username must be 4 charactes at leats'}),
+        body: jsonEncode({'message': 'username must be at least 4 characters'}),
         headers: {'Content-Type': 'application/json'},
       );
     }
-
     if (authRequest.password.length < 6) {
       return Response.badRequest(
-        body: jsonEncode({
-          'message': 'Password must be 6 characters at leatst',
-        }),
+        body: jsonEncode({'message': 'Password must be 6 characters as least'}),
         headers: {'Content-Type': 'application/json'},
       );
     }
-
-    if (authRequest.username == FakeUser.serverUser['username'] &&
-        authRequest.password == FakeUser.serverUser['password']) {
+    final user = await userRepository.findByUsernameAndPassword(
+      authRequest.username,
+      authRequest.password,
+    );
+    if (user != null) {
       return Response.ok(
         jsonEncode({
           'message': 'Login success',
-          'username': authRequest.username,
+          'username': user.username,
           'token': 'fake-token-123',
         }),
         headers: {'Content-Type': 'application/json'},
       );
     }
     return Response.forbidden(
-      jsonEncode({'message': 'Invalid credentails'}),
+      jsonEncode({'message': 'Invalid credentials'}),
       headers: {'Content-Type': 'application/json'},
     );
   });
