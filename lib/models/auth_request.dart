@@ -20,7 +20,7 @@ class AuthRequest {
   List<String> validate() {
     final errors = <String>[];
 
-    if (isUsernameEmpty() || isUsernameEmpty()) {
+    if (isUsernameEmpty() || isPasswordEmpty()) {
       errors.add('Username and password cannot be empty');
     }
     if (username
