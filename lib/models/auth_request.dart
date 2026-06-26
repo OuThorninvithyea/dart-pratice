@@ -11,7 +11,7 @@ class AuthRequest {
     );
   }
   bool isUsernameEmpty() {
-    return username.trim().isNotEmpty;
+    return username.trim().isEmpty;
   }
   bool isPasswordEmpty() {
     return password.trim().isEmpty;
@@ -23,9 +23,7 @@ class AuthRequest {
     if (isUsernameEmpty() || isPasswordEmpty()) {
       errors.add('Username and password cannot be empty');
     }
-    if (username
-        .trim()
-        .length < 4) {
+    if (username.trim().length < 4) {
       errors.add('Username must be at least 4 characters');
     }
     if (password.length < 6) {
