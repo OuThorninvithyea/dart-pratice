@@ -10,15 +10,17 @@ class AuthRequest {
         json['password'] is  String ? json['password'] as String : '',
     );
   }
+  bool isUsernameEmpty() {
+    return username.trim().isNotEmpty;
+  }
+  bool isPasswordEmpty() {
+    return password.trim().isEmpty;
+  }
 
   List<String> validate() {
     final errors = <String>[];
 
-    if (username
-        .trim()
-        .isEmpty || password
-        .trim()
-        .isEmpty) {
+    if (isUsernameEmpty() || isUsernameEmpty()) {
       errors.add('Username and password cannot be empty');
     }
     if (username
