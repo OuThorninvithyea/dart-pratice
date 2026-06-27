@@ -1,3 +1,5 @@
+import 'package:dart_api/models/validation_errors.dart';
+
 class AuthRequest {
   final String username;
   final String password;
@@ -6,33 +8,34 @@ class AuthRequest {
 
   factory AuthRequest.fromJson(Map<String, dynamic> json) {
     return AuthRequest
-        (json['username'] is  String ? json['username'] as String : '',
+        (
+      json['username'] is String ? json['username'] as String : '',
         json['password'] is  String ? json['password'] as String : '',
     );
   }
+  bool isUsernameEmpty() {
+    return username.trim().isEmpty;
+  }
+  bool isPasswordEmpty() {
+    return password.trim().isEmpty;
+  }
 
-  List<String> validate() {
-    final errors = <String>[];
+  List<ValidationErrors> validate() {
 
-    if (username
-        .trim()
-        .isEmpty || password
-        .trim()
-        .isEmpty) {
-      errors.add('Username and password cannot be empty');
-    }
-    if (username
-        .trim()
-        .length < 4) {
-      errors.add('Username must be at least 4 characters');
-    }
-    if (password.length < 6) {
-      errors.add('Password must be at least 6 characters');
+    final errors = <ValidationErrors> [];
+
+    if (username.isEmpty) {
+      return [ValidationErrors(field: ValidationsField.username, message: 'Username cannot be empty')];
+    } else if (username.length < 4) {
+      return [ValidationErrors(field: ValidationsField.username, message: 'Username must be at least 4 characters')];
     }
 
+    if (password.isEmpty) {
+      return [ValidationErrors(field: ValidationsField.password, message: 'Password cannot be empty')];
+    } else if (password.length < 6 ) {
+      return [ValidationErrors(field: ValidationsField.password, message: 'Password must be at least 6 characters')];
+    }
     return errors;
   }
-  Map<String, dynamic> toJson() {
-    return {'username': username, "password": password};
-  }
+
 }

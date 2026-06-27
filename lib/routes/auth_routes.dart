@@ -20,6 +20,7 @@ Router authRoute(UserRepository userRepository) {
         headers: {'Content-Type': 'application/json'},
       );
     }
+
     final authRequest = AuthRequest.fromJson(json);
     final errors = authRequest.validate();
 
@@ -27,8 +28,9 @@ Router authRoute(UserRepository userRepository) {
       return Response.badRequest(
         body: jsonEncode({
           'message': 'Validation failed',
-          'error': errors,
-        })
+          'error': errors.map((errors) => errors.toJson()).toList(),
+        }),
+        headers: {'Content-Type': 'application/json'},
       );
     }
     final user = await userRepository.findByUsernameAndPassword(
